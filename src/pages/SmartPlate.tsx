@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/Card';
 import { Button } from '../components/Button';
-import { Upload, Camera, AlertCircle, Check } from 'lucide-react';
+import { Upload, X, Camera, Utensils, ChevronRight, Image, ChevronDown } from 'lucide-react';
 
 const SmartPlate: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const mockNutrition = {
-    calories: 450,
-    protein: 25,
-    carbs: 45,
-    fats: 20,
-    vitamins: ['Vitamin A', 'Vitamin C', 'Iron'],
-    suggestions: [
-      'Add more leafy greens for iron',
-      'Consider adding nuts for healthy fats',
-      'Include a source of vitamin D'
-    ]
-  };
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -28,192 +30,187 @@ const SmartPlate: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
+    setIsDropdownOpen(false);
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // Here you would typically handle the camera stream
+      // For now, we'll just close the dropdown
+      setIsDropdownOpen(false);
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+      alert('Unable to access camera. Please make sure you have granted camera permissions.');
+    }
+  };
+
+  // Mock nutrition data
+  const nutrition = {
+    calories: 450,
+    protein: 25,
+    carbs: 45,
+    fats: 20,
+    vitamins: ['Vitamin A', 'Vitamin C', 'Iron'],
+    suggestions: [
+      'Add more leafy greens for iron',
+      'Consider adding lean protein',
+      'Include whole grains for fiber'
+    ]
   };
 
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className=" bg-background dark:bg-gray-900 py-12">
       <div className="container px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 gradient-text">
             Smart Plate Scanner
           </h1>
-          <p className="text-lg text-gray-700">
-            Analyze your meal and get instant nutrition insights
+          <p className="text-lg text-gray-700 dark:text-gray-300">
+            Upload a photo of your meal for instant nutrition insights
           </p>
         </div>
 
         {/* Image Upload Section */}
-        <Card className="mb-8">
+        <Card className="mb-8 dark:bg-gray-800">
           <CardContent className="p-6">
-            <div className="flex flex-col items-center">
-              <div className="w-full max-w-md">
-                <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center ${
-                    selectedImage ? 'border-pink-500' : 'border-gray-300'
-                  }`}
-                >
-                  {selectedImage ? (
-                    <div className="space-y-4">
-                      <img
-                        src={selectedImage}
-                        alt="Uploaded meal"
-                        className="max-h-64 mx-auto rounded-lg"
-                      />
-                      <Button
-                        variant="outline"
-                        onClick={() => setSelectedImage(null)}
-                        className="mt-4"
-                      >
-                        Remove Image
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="flex justify-center">
-                        <Upload className="h-12 w-12 text-gray-400" />
-                      </div>
-                      <p className="text-gray-600">
-                        Drag and drop an image here, or click to select
-                      </p>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        id="image-upload"
-                      />
-                      <div className="flex gap-4 justify-center">
-                        <Button
-                          variant="outline"
-                          onClick={() => document.getElementById('image-upload')?.click()}
-                        >
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload Image
-                        </Button>
-                        <Button variant="outline">
-                          <Camera className="h-4 w-4 mr-2" />
-                          Take Photo
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+            <div className="flex flex-col items-center justify-center">
+              {selectedImage ? (
+                <div className="relative">
+                  <img
+                    src={selectedImage}
+                    alt="Uploaded meal"
+                    className="max-w-full h-auto rounded-lg max-h-[400px]"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute top-2 right-2 dark:bg-gray-700 dark:text-gray-200"
+                    onClick={() => setSelectedImage(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center">
+                  <div className="mb-4">
+                    <Camera className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <div className="relative" ref={dropdownRef}>
+                    <Button
+                      className="gradient-pink text-white"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Add Image
+                      <ChevronDown className="h-4 w-4 ml-2" />
+                    </Button>
+                    
+                    {isDropdownOpen && (
+                      <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                        <div className="py-1" role="menu">
+                          <button
+                            className="w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            <Image className="h-4 w-4 mr-2" />
+                            Choose from gallery
+                          </button>
+                          <button
+                            className="w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                            onClick={handleCameraCapture}
+                          >
+                            <Camera className="h-4 w-4 mr-2" />
+                            Take photo
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <input
+                      ref={fileInputRef}
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Supported formats: JPG, PNG
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
 
+        {/* Nutrition Analysis */}
         {selectedImage && (
-          <>
-            {/* Nutritional Analysis */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Nutritional Breakdown</CardTitle>
-                  <CardDescription>Estimated values per serving</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span>Calories</span>
-                      <span className="font-semibold">{mockNutrition.calories} kcal</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600">Protein</div>
-                        <div className="font-semibold">{mockNutrition.protein}g</div>
-                      </div>
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600">Carbs</div>
-                        <div className="font-semibold">{mockNutrition.carbs}g</div>
-                      </div>
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600">Fats</div>
-                        <div className="font-semibold">{mockNutrition.fats}g</div>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2">Vitamins & Minerals</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {mockNutrition.vitamins.map((vitamin, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-pink-100 text-pink-700 rounded-full text-sm"
-                          >
-                            {vitamin}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Suggestions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Suggestions for Improvement</CardTitle>
-                  <CardDescription>Tips to enhance your meal's nutrition</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {mockNutrition.suggestions.map((suggestion, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
-                      >
-                        <AlertCircle className="h-5 w-5 text-pink-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm">{suggestion}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Daily Progress */}
-            <Card className="bg-gradient-to-r from-pink-50 to-rose-50">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="dark:bg-gray-800">
               <CardHeader>
-                <CardTitle>Daily Nutrition Progress</CardTitle>
-                <CardDescription>Based on your recommended daily intake</CardDescription>
+                <CardTitle className="dark:text-gray-100">Nutritional Breakdown</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Estimated values based on image analysis
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Check className="h-5 w-5 text-pink-500" />
-                      <span>Protein Goal</span>
-                    </div>
-                    <div className="w-1/2">
-                      <div className="h-2 bg-gray-200 rounded-full">
-                        <div
-                          className="h-2 bg-pink-500 rounded-full"
-                          style={{ width: '75%' }}
-                        ></div>
-                      </div>
-                    </div>
-                    <span className="text-sm font-medium">75%</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 dark:text-gray-300">Calories</span>
+                    <span className="font-semibold dark:text-gray-200">{nutrition.calories} kcal</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Check className="h-5 w-5 text-pink-500" />
-                      <span>Vitamin Goals</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 dark:text-gray-300">Protein</span>
+                    <span className="font-semibold dark:text-gray-200">{nutrition.protein}g</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 dark:text-gray-300">Carbs</span>
+                    <span className="font-semibold dark:text-gray-200">{nutrition.carbs}g</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 dark:text-gray-300">Fats</span>
+                    <span className="font-semibold dark:text-gray-200">{nutrition.fats}g</span>
+                  </div>
+                  <div className="pt-4">
+                    <h4 className="text-sm font-semibold mb-2 dark:text-gray-200">Vitamins & Minerals</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {nutrition.vitamins.map((vitamin, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-300 rounded-full text-xs"
+                        >
+                          {vitamin}
+                        </span>
+                      ))}
                     </div>
-                    <div className="w-1/2">
-                      <div className="h-2 bg-gray-200 rounded-full">
-                        <div
-                          className="h-2 bg-pink-500 rounded-full"
-                          style={{ width: '60%' }}
-                        ></div>
-                      </div>
-                    </div>
-                    <span className="text-sm font-medium">60%</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </>
+
+            <Card className="dark:bg-gray-800">
+              <CardHeader>
+                <CardTitle className="dark:text-gray-100">Suggestions for Improvement</CardTitle>
+                <CardDescription className="dark:text-gray-400">
+                  Tips to enhance your meal's nutritional value
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-4">
+                  {nutrition.suggestions.map((suggestion, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <ChevronRight className="h-5 w-5 text-pink-500 shrink-0 mt-0.5" />
+                      <span className="text-gray-600 dark:text-gray-300">{suggestion}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
         )}
+
       </div>
     </div>
   );

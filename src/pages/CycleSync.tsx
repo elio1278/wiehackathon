@@ -92,13 +92,13 @@ const CycleSync: React.FC = () => {
   const currentPhase = phases.find(phase => phase.id === selectedPhase)!;
 
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className="min-h-screen bg-background dark:bg-gray-900 py-12">
       <div className="container px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 gradient-text">
             Cycle Sync Nutrition
           </h1>
-          <p className="text-lg text-gray-700">
+          <p className="text-lg text-gray-700 dark:text-gray-300">
             Optimize your nutrition based on your menstrual cycle phase
           </p>
         </div>
@@ -112,7 +112,7 @@ const CycleSync: React.FC = () => {
               className={`flex items-center gap-2 ${
                 selectedPhase === phase.id
                   ? 'gradient-pink text-white'
-                  : ''
+                  : 'dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
               }`}
               onClick={() => setSelectedPhase(phase.id)}
             >
@@ -125,25 +125,25 @@ const CycleSync: React.FC = () => {
         {/* Current Phase Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Phase Overview */}
-          <Card>
+          <Card className="dark:bg-gray-800">
             <CardHeader>
               <div className="flex items-center gap-3">
                 {currentPhase.icon}
                 <div>
-                  <CardTitle>{currentPhase.name}</CardTitle>
-                  <CardDescription>{currentPhase.duration}</CardDescription>
+                  <CardTitle className="dark:text-gray-100">{currentPhase.name}</CardTitle>
+                  <CardDescription className="dark:text-gray-400">{currentPhase.duration}</CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Key Nutrients</h3>
+                  <h3 className="font-semibold mb-2 dark:text-gray-200">Key Nutrients</h3>
                   <div className="flex flex-wrap gap-2">
                     {currentPhase.nutrients.map((nutrient, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-sm"
+                        className="px-3 py-1 bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-300 rounded-full text-sm"
                       >
                         {nutrient}
                       </span>
@@ -155,15 +155,15 @@ const CycleSync: React.FC = () => {
           </Card>
 
           {/* Recommended Foods */}
-          <Card>
+          <Card className="dark:bg-gray-800">
             <CardHeader>
-              <CardTitle>Recommended Foods</CardTitle>
-              <CardDescription>Foods to support your body during this phase</CardDescription>
+              <CardTitle className="dark:text-gray-100">Recommended Foods</CardTitle>
+              <CardDescription className="dark:text-gray-400">Foods to support your body during this phase</CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="grid grid-cols-2 gap-2">
                 {currentPhase.foods.map((food, index) => (
-                  <li key={index} className="flex items-center gap-2">
+                  <li key={index} className="flex items-center gap-2 dark:text-gray-300">
                     <span className="h-1.5 w-1.5 rounded-full bg-pink-500"></span>
                     {food}
                   </li>
@@ -173,11 +173,11 @@ const CycleSync: React.FC = () => {
           </Card>
 
           {/* Nutrition Tips */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 dark:bg-gray-800">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <Calendar className="h-6 w-6 text-pink-500" />
-                <CardTitle>Phase-Specific Tips</CardTitle>
+                <CardTitle className="dark:text-gray-100">Phase-Specific Tips</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
@@ -185,10 +185,10 @@ const CycleSync: React.FC = () => {
                 {currentPhase.tips.map((tip, index) => (
                   <div
                     key={index}
-                    className="p-4 bg-gray-50 rounded-lg flex items-start gap-3"
+                    className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-start gap-3"
                   >
                     <span className="h-2 w-2 rounded-full bg-pink-500 mt-2"></span>
-                    <p>{tip}</p>
+                    <p className="dark:text-gray-300">{tip}</p>
                   </div>
                 ))}
               </div>
@@ -197,13 +197,13 @@ const CycleSync: React.FC = () => {
         </div>
 
         {/* Connect Calendar CTA */}
-        <Card className="mt-12 bg-gradient-to-r from-pink-50 to-rose-50">
+        <Card className="mt-12 bg-gradient-to-r from-pink-50 to-rose-50 dark:from-gray-800 dark:to-gray-900">
           <CardContent className="flex flex-col md:flex-row items-center justify-between p-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">
+              <h3 className="text-lg font-semibold mb-2 dark:text-gray-100">
                 Connect Your Cycle Tracking App
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Get automated recommendations based on your cycle
               </p>
             </div>

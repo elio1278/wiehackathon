@@ -29,13 +29,13 @@ const LifeStage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className=" bg-background dark:bg-gray-900 py-12">
       <div className="container px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 gradient-text">
             Select Your Life Stage
           </h1>
-          <p className="text-lg text-gray-700">
+          <p className="text-lg text-gray-700 dark:text-gray-300">
             Choose your current life stage to get a personalized nutrition plan
           </p>
         </div>
@@ -44,34 +44,25 @@ const LifeStage: React.FC = () => {
           {stages.map((stage) => (
             <Card 
               key={stage.id}
-              className="border-2 border-transparent hover:border-pink-500 cursor-pointer transition-all"
+              className="border-2 border-transparent hover:border-pink-500 cursor-pointer transition-all dark:bg-gray-800 dark:hover:border-pink-400"
               onClick={() => navigate(`/plan/${stage.id}`)}
             >
               <CardHeader>
                 <div className="flex items-center gap-4">
                   {stage.icon}
-                  <CardTitle>{stage.title}</CardTitle>
+                  <CardTitle className="dark:text-gray-100">{stage.title}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription>{stage.description}</CardDescription>
+                <CardDescription className="dark:text-gray-400">{stage.description}</CardDescription>
               </CardContent>
+              
             </Card>
+            
+
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-sm text-gray-500 mb-4">
-            Not sure about your life stage? Take our quick assessment
-          </p>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/assessment')}
-            className="hover:bg-pink-50"
-          >
-            Take Assessment
-          </Button>
-        </div>
       </div>
     </div>
   );
